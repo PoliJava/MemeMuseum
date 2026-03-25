@@ -29,4 +29,15 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+    public function memes(){
+        return $this->hasMany(Meme::class);
+    }
+
+    public function comments(){
+        return $this->hasMany(Comment::class);
+    }
+
+    public function votes(){
+        return $this->hasMany(Vote::class);
+    }
 }
