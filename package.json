@@ -1,0 +1,31 @@
+{
+  "name": "mememuseum",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/PoliJava/MemeMuseum.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/PoliJava/MemeMuseum/issues"
+  },
+  "homepage": "https://github.com/PoliJava/MemeMuseum#readme",
+  "dependencies": {
+    "@vitejs/plugin-vue": "^6.0.5",
+    "@vueuse/core": "^14.2.1",
+    "axios": "^1.13.6",
+    "laravel-vite-plugin": "^3.0.0",
+    "pinia": "^3.0.4",
+    "vite": "^8.0.3",
+    "vue": "^3.5.31",
+    "vue-router": "^5.0.4"
+  }
+}
