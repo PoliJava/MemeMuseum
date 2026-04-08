@@ -4,7 +4,7 @@ use App\Http\Controllers\MemeController;
 use App\Http\Controllers\CommentController;
 use App\Http\Controllers\VoteController;
 use App\Http\Controllers\TagController;
-//use App\Http\Controllers\AuthController; 
+use App\Http\Controllers\AuthController; 
 use Illuminate\Support\Facades\Route;
 
 Route::get('/memes', [MemeController::class, 'index']);

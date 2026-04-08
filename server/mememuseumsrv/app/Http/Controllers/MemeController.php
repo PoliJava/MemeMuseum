@@ -2,11 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use Inertia\Inertia;
 use App\Models\Meme;
 use App\Enums\MemeAge;
 use Illuminate\Http\Request;
 use App\Http\Resources\MemeResource;
+use App\Http\Requests\Meme\StoreRequest;   
+use App\Http\Requests\Meme\UpdateRequest;
+
 
 
 class MemeController extends Controller
@@ -24,41 +26,29 @@ public function show(Meme $meme)
     return new MemeResource($meme);
 }
 
-public function store(Request $request)
-{
-    $validated = $request->validate([
-        'title'      => 'required|string|max:255',
-        'image'      => 'required|image|max:2048', // gestione file
-        'age'        => 'required|in:' . implode(',', array_column(MemeAge::cases(), 'value')),
-        'tags'       => 'array|exists:tags,id',   // array di tag ids
-    ]);
-
-    // Salva l'immagine
-    $path = $request->file('image')->store('memes', 'public');
-
-    $meme = Meme::create([
-        'title'      => $validated['title'],
-        'image_path' => $path,
-        'age'        => $validated['age'],
-        'user_id'    => auth()->id(),
-    ]);
-
-    if (!empty($validated['tags'])) {
-        $meme->tags()->sync($validated['tags']);
-    }
-
-    return new MemeResource($meme->load('tags', 'user'));
-}
-    public function update(Request $request, Meme $meme)
+public function store(StoreRequest $request) // <-- sostituisce Request
     {
-        $validated = $request->validate([
-            'title' => 'sometimes|string|max:255',
-            'age'   => 'sometimes|in:' . implode(',', array_column(MemeAge::cases(), 'value')),
+        // $request->validated() contiene già i dati validati
+        $path = $request->file('image')->store('memes', 'public');
+
+        $meme = Meme::create([
+            'title'      => $request->validated('title'),
+            'image_path' => $path,
+            'age'        => $request->validated('age'),
+            'user_id'    => $request->user()->id,
         ]);
 
-        $meme->update($validated);
+        if ($request->validated('tags')) {
+            $meme->tags()->sync($request->validated('tags'));
+        }
 
-        return redirect()->route('memes.show', $meme);
+        return new MemeResource($meme->load('tags', 'user'));
+    }
+
+    public function update(UpdateRequest $request, Meme $meme) 
+    {
+        $meme->update($request->validated()); 
+        return new MemeResource($meme);
     }
 
     public function destroy(Meme $meme)
