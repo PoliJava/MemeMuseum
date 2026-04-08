@@ -14,7 +14,7 @@ class MemeController extends Controller
 
 public function index()
 {
-    $memes = Meme::with(['user', 'tags'])->latest()->paginate(10); // paginazione richiesta
+    $memes = Meme::with(['user', 'tags'])->latest()->paginate(10);
     return MemeResource::collection($memes);
 }
 
