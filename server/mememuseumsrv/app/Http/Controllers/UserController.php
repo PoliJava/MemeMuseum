@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Http\Requests\Auth\LoginRequest;
+use Illuminate\Http\JsonResponse;
 
 class UserController extends Controller
 {
@@ -61,4 +63,17 @@ class UserController extends Controller
     {
         //
     }
+
+    public function login(LoginRequest $request): JsonResponse
+{
+    $request->authenticate();
+
+    $request->session()->regenerate();
+
+    return response()->json([
+        'message' => 'Login effettuato',
+        'user' => auth()->user()
+    ]);
 }
+
+    }

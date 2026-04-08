@@ -6,6 +6,7 @@ use App\Http\Controllers\VoteController;
 use App\Http\Controllers\TagController;
 use App\Http\Controllers\AuthController; 
 use Illuminate\Support\Facades\Route;
+use Illuminate\Http\Request;
 
 Route::get('/memes', [MemeController::class, 'index']);
 Route::get('/memes/{meme}', [MemeController::class, 'show']);
@@ -28,6 +29,9 @@ Route::middleware('auth:sanctum')->group(function () {
 });
 
 // Autenticazione (crea un AuthController con login, registrazione, logout)
+Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
+    return $request->user();
+});
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth:sanctum');
