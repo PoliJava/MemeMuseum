@@ -64,16 +64,5 @@ class UserController extends Controller
         //
     }
 
-    public function login(LoginRequest $request): JsonResponse
-{
-    $request->authenticate();
-
-    $request->session()->regenerate();
-
-    return response()->json([
-        'message' => 'Login effettuato',
-        'user' => auth()->user()
-    ]);
-}
 
     }
