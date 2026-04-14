@@ -2,21 +2,17 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 
-class Vote extends Model
+class Rating extends Model
 {
     use HasFactory;
 
-    protected $fillable = [
-        'user_id',
-        'meme_id',
-        'value', // 1 = upvote, -1 = downvote
-    ];
+    protected $fillable = ['user_id', 'meme_id', 'value'];
 
     protected $casts = [
-        'value' => 'integer',
+        'value' => 'float',
     ];
 
     public function user()

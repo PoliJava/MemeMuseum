@@ -43,4 +43,10 @@ class User extends Authenticatable
     public function votes(){
         return $this->hasMany(Vote::class);
     }
-}
+
+    public function ratings(){
+        return $this->hasMany(Rating::class);
+    }
+
+    }
+

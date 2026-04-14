@@ -7,10 +7,16 @@ use App\Http\Controllers\TagController;
 use App\Http\Controllers\AuthController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
+use App\Http\Controllers\BoardController;
+use App\Http\Controllers\RatingController;
 
 // Auth
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login',    [AuthController::class, 'login']);
+
+// Public boards
+Route::get('/boards', [BoardController::class, 'index']);
+Route::get('/boards/{board}', [BoardController::class, 'show']);
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
@@ -25,10 +31,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/comments',              [CommentController::class, 'store']);
     Route::delete('/comments/{comment}',  [CommentController::class, 'destroy']);
 
-    // Votes
-    Route::post('/votes',         [VoteController::class, 'store']);
-    Route::delete('/votes/{vote}',[VoteController::class, 'destroy']);
-
     // Tags
     Route::post('/memes/{meme}/tags',            [TagController::class, 'attach']);
     Route::delete('/memes/{meme}/tags/{tag}',    [TagController::class, 'detach']);
@@ -37,3 +39,15 @@ Route::middleware('auth:sanctum')->group(function () {
 // Public meme browsing
 Route::get('/memes',        [MemeController::class, 'index']);
 Route::get('/memes/{meme}', [MemeController::class, 'show']);
+Route::get('/tags/popular', [TagController::class, 'popular']);
+
+// Authenticated ratings
+Route::middleware('auth:sanctum')->group(function () {
+    Route::post('/ratings', [RatingController::class, 'store']);
+    Route::delete('/ratings/{meme}', [RatingController::class, 'destroy']);
+});
+
+Route::middleware('auth:sanctum')->group(function () {
+    Route::post('/memes/{meme}/tags', [TagController::class, 'attach']);
+    Route::delete('/memes/{meme}/tags/{tag}', [TagController::class, 'detach']);
+});

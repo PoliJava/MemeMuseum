@@ -75,13 +75,21 @@ async function logout(): Promise<void> {
 
 async function fetchUser(): Promise<void> {
   try {
-    const res = await fetch(`${API}/api/user`, {
+    const res = await fetch(`${API_BASE}/api/user`, {
       credentials: 'include',
       headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
     })
-    if (res.ok) user.value = (await res.json()) as AuthUser
-  } catch {
-    // not authenticated — silently ignore
+    if (res.status === 401) {
+      // Non autenticato: nessun log, nessuna eccezione
+      return
+    }
+    if (!res.ok) {
+      throw new Error(`HTTP ${res.status}`)
+    }
+    user.value = await res.json()
+  } catch (err) {
+    // Solo errori di rete o status inaspettati
+    console.warn('Failed to fetch user:', err)
   }
 }
 

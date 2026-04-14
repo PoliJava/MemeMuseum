@@ -10,24 +10,20 @@ return new class extends Migration
      * Run the migrations.
      */
     public function up(): void
-{
-    Schema::create('votes', function (Blueprint $table) {
+    {
+        Schema::create('meme_tag', function (Blueprint $table) {
         $table->id();
-        $table->foreignId('user_id')->constrained()->onDelete('cascade');
-        $table->foreignId('meme_id')->constrained()->onDelete('cascade');
-        $table->tinyInteger('value'); // 1 o -1
+        $table->foreignId('meme_id')->constrained()->cascadeOnDelete();
+        $table->foreignId('tag_id')->constrained()->cascadeOnDelete();
         $table->timestamps();
-
-        // Un utente può votare un meme una sola volta
-        $table->unique(['user_id', 'meme_id']);
     });
-}
+    }
 
     /**
      * Reverse the migrations.
      */
     public function down(): void
     {
-        Schema::dropIfExists('votes');
+        Schema::dropIfExists('meme_tag');
     }
 };
