@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Meme;
 use App\Models\Tag;
 use Illuminate\Http\Request;
-use App\Https\Resources\TagResource;
+use App\Http\Resources\TagResource;
 class TagController extends Controller
 {
     public function attach(Request $request, Meme $meme)

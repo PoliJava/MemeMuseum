@@ -1,32 +1,32 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
-import { useApi } from '../composables/useApi'
-import TagCloud from './TagCloud.vue'
+import { ref, onMounted } from "vue";
+import { useApi } from "../composables/useApi";
+import TagCloud from "./TagCloud.vue";
 
 interface Board {
-  id: number
-  slug: string
-  name: string
-  description: string
-  is_archived: boolean
-  is_readonly: boolean
-  memes_count?: number
+  id: number;
+  slug: string;
+  name: string;
+  description: string;
+  is_archived: boolean;
+  is_readonly: boolean;
+  memes_count?: number;
 }
 
-const { get } = useApi()
-const boards = ref<Board[]>([])
-const loading = ref(true)
+const { get } = useApi();
+const boards = ref<Board[]>([]);
+const loading = ref(true);
 
 onMounted(async () => {
   try {
-    const res = await get<{ data: Board[] }>('/boards')
-    boards.value = res.data
+    const res = await get<{ data: Board[] }>("/boards");
+    boards.value = res.data;
   } catch (err) {
-    console.error('Error fetching boards:', err)
+    console.error("Error fetching boards:", err);
   } finally {
-    loading.value = false
+    loading.value = false;
   }
-})
+});
 </script>
 
 <template>
@@ -36,7 +36,7 @@ onMounted(async () => {
         <h2 class="section-title">Galleries &amp; Boards</h2>
         <span class="section-rule"></span>
       </div>
-      <div v-if="loading" class="loading">Loading boards...</div>
+      <div v-if="loading" class="loading">Loading boards…</div>
       <div v-else class="boards-table">
         <div class="boards-table-head">
           <span>Board</span>
@@ -77,17 +77,23 @@ onMounted(async () => {
           <li>The curators' decisions are final.</li>
         </ol>
       </div>
-      <div class="sidebar-block sidebar-block--cta">
+      <!-- No submit CTA here: posting requires a board context.
+           The "+ New Thread" button lives in BoardView. -->
+      <div class="sidebar-block sidebar-block--hint">
         <div class="sidebar-block-title">Contribute</div>
-        <p>Have an original work or a significant cultural artifact?</p>
-        <button class="btn-primary btn-full" @click="$emit('openPostModal')">
-          Submit to Collection →
-        </button>
+        <p>
+          Enter a board and use the <strong>+ New Thread</strong> button to
+          submit a work.
+        </p>
       </div>
     </aside>
   </div>
 </template>
 
 <style scoped>
-.loading { padding: 20px; text-align: center; color: var(--grey); }
+.loading {
+  padding: 20px;
+  text-align: center;
+  color: var(--grey);
+}
 </style>

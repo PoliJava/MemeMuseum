@@ -1,43 +1,42 @@
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted } from 'vue'
-import AuthModal from './components/AuthModal.vue'
-import PostModal from './components/PostModal.vue'
-import { useAuth } from './composables/useAuth'
+import { ref, onMounted } from "vue";
+import AuthModal from "./components/AuthModal.vue";
+import PostModal from "./components/PostModal.vue";
+import { useAuth } from "./composables/useAuth";
+import { usePostModal } from "./composables/usePostModal";
 
-const { user, logout, fetchUser } = useAuth()
-const showAuth = ref(false)
-const showPostModal = ref(false)
-const currentBoardSlug = ref<string | null>(null)
+const { user, logout, fetchUser } = useAuth();
+const {
+  isOpen: showPostModal,
+  boardSlug: currentBoardSlug,
+  open: openPost,
+  close: closePost,
+} = usePostModal();
+const showAuth = ref(false);
 
-onMounted(() => fetchUser())
+onMounted(() => fetchUser());
 
-function openPostModal(boardSlug?: string) {
-  currentBoardSlug.value = boardSlug || null
+function handleThreadCreated(meme: any) {
+  closePost();
+  // Tell the active BoardView to re-fetch
+  window.dispatchEvent(
+    new CustomEvent("boardview:refresh", {
+      detail: { slug: currentBoardSlug.value },
+    }),
+  );
+}
+
+function requireAuthThenPost(slug?: string) {
   if (!user.value) {
-    showAuth.value = true
+    showAuth.value = true;
   } else {
-    showPostModal.value = true
+    openPost(slug);
   }
 }
-
-// Listener per l'evento custom emesso da BoardView
-function handleCustomEvent(e: CustomEvent) {
-  if (e.type === 'openPostModal') {
-    openPostModal((e as CustomEvent).detail?.boardSlug)
-  }
-}
-
-onMounted(() => {
-  window.addEventListener('openPostModal', handleCustomEvent as EventListener)
-})
-onUnmounted(() => {
-  window.removeEventListener('openPostModal', handleCustomEvent as EventListener)
-})
 </script>
 
 <template>
   <div id="museum-root">
-
     <div class="noise" aria-hidden="true"></div>
 
     <!-- HEADER -->
@@ -55,15 +54,16 @@ onUnmounted(() => {
         <nav class="header-nav">
           <router-link to="/">Collection</router-link>
           <a href="#">Exhibitions</a>
-          <a href="#" @click.prevent="openPostModal()">Submit</a>
           <a href="#">About</a>
 
-          <!-- Logged out: Sign In button -->
-          <a v-if="!user" href="#" class="nav-login" @click.prevent="showAuth = true">
+          <a
+            v-if="!user"
+            href="#"
+            class="nav-login"
+            @click.prevent="showAuth = true"
+          >
             Sign In
           </a>
-
-          <!-- Logged in: curator name + sign out -->
           <template v-else>
             <span class="nav-curator">
               <span class="nav-curator-dot"></span>
@@ -79,15 +79,22 @@ onUnmounted(() => {
     <section class="hero-banner">
       <div class="hero-inner">
         <div class="hero-label">Welcome to the Collection</div>
-        <h1 class="hero-title">The World's Premier<br><em>Meme Repository</em></h1>
+        <h1 class="hero-title">
+          The World's Premier<br /><em>Meme Repository</em>
+        </h1>
         <p class="hero-desc">
-          A living archive of internet culture. Browse the boards, contribute original works,
-          and participate in the ongoing curatorial discourse.
+          A living archive of internet culture. Browse the boards, contribute
+          original works, and participate in the ongoing curatorial discourse.
         </p>
         <div class="hero-actions">
-          <a href="#boards" class="btn-primary">Enter the Museum</a>
-          <a href="#" class="btn-ghost" @click.prevent="openPostModal()">
-            {{ user ? 'Submit a Work' : 'Sign In to Submit' }}
+          <router-link to="/" class="btn-primary">Enter the Museum</router-link>
+          <a
+            v-if="!user"
+            href="#"
+            class="btn-ghost"
+            @click.prevent="showAuth = true"
+          >
+            Sign In to Contribute
           </a>
         </div>
       </div>
@@ -107,13 +114,15 @@ onUnmounted(() => {
         <span class="sep">·</span>
         <span>Works catalogued: <strong>12,493</strong></span>
         <span class="sep">·</span>
-        <span class="ticker-notice">This is an anonymous imageboard. Curate responsibly.</span>
+        <span class="ticker-notice"
+          >This is an anonymous imageboard. Curate responsibly.</span
+        >
       </div>
     </div>
 
-    <!-- MAIN: router view -->
+    <!-- MAIN -->
     <main>
-      <router-view @openPostModal="openPostModal" />
+      <router-view />
     </main>
 
     <!-- FOOTER -->
@@ -129,20 +138,18 @@ onUnmounted(() => {
       </div>
     </footer>
 
-    <!-- MODALI GLOBALI -->
+    <!-- GLOBAL MODALS -->
     <AuthModal :open="showAuth" @close="showAuth = false" />
     <PostModal
       :open="showPostModal"
       :board-slug="currentBoardSlug"
-      @close="showPostModal = false"
-      @threadCreated="() => { /* puoi eventualmente ricaricare la board corrente */ }"
+      @close="closePost"
+      @thread-created="handleThreadCreated"
     />
-
   </div>
 </template>
 
 <style>
-/* Logged-in curator indicator in nav */
 .nav-curator {
   display: flex;
   align-items: center;
@@ -151,7 +158,6 @@ onUnmounted(() => {
   color: var(--brown-lt);
   padding: 5px 10px;
 }
-
 .nav-curator-dot {
   width: 6px;
   height: 6px;

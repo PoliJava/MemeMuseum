@@ -19,6 +19,7 @@ class BoardController extends Controller
     {
         $memes = $board->memes()
             ->with(['user', 'tags'])
+            ->withCount('comments')    
             ->withAvg('ratings', 'value')
             ->latest()
             ->paginate(15);

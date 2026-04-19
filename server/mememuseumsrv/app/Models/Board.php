@@ -20,4 +20,10 @@ class Board extends Model
     {
         return $this->hasMany(Meme::class);
     }
+
+    public function getRouteKeyName(): string
+{
+    return 'slug';
+}
+
 }
