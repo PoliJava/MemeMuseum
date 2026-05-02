@@ -254,4 +254,9 @@ function handleReplyCreated(newReply: Comment) {
 .reply-link:hover {
   text-decoration: underline;
 }
+
+@media (max-width: 480px) {
+  .reply-post--nested { margin-left: 12px; }
+  .thread-view { padding: 0 2px; }
+}
 </style>

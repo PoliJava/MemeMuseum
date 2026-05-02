@@ -2,6 +2,7 @@
 import { ref, onMounted } from "vue";
 import { useApi } from "../composables/useApi";
 import TagCloud from "./TagCloud.vue";
+import MemeOfTheDay from "./MemeOfTheDay.vue";
 
 interface Board {
   id: number;
@@ -66,6 +67,7 @@ onMounted(async () => {
     </section>
 
     <aside class="sidebar">
+      <MemeOfTheDay />
       <TagCloud />
       <div class="sidebar-block sidebar-block--rules">
         <div class="sidebar-block-title">Museum Rules</div>

@@ -14,6 +14,7 @@ class BoardResource extends JsonResource
             'slug'        => $this->slug,
             'name'        => $this->name,
             'description' => $this->description,
+            'sticky_body' => $this->sticky_body,
             'is_archived' => $this->is_archived,
             'is_readonly' => $this->is_readonly,
             'memes_count' => $this->whenCounted('memes'),

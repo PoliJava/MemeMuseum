@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Meme;
+use App\Models\Tag;
 use App\Enums\MemeAge;
 use Illuminate\Http\Request;
 use App\Http\Resources\MemeResource;
@@ -11,13 +12,50 @@ use App\Http\Requests\Meme\UpdateRequest;
 
 class MemeController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $memes = Meme::with(['user', 'tags', 'board'])
-                    ->withAvg('ratings', 'value')
-                    ->latest()
-                    ->paginate(10);
-        return MemeResource::collection($memes);
+        $query = Meme::with(['user', 'tags', 'board'])
+                     ->withAvg('ratings', 'value')
+                     ->withCount('comments');
+
+        if ($request->filled('tag')) {
+            $query->whereHas('tags', fn($q) => $q->where('name', $request->tag));
+        }
+
+        if ($request->filled('date_from')) {
+            $query->whereDate('created_at', '>=', $request->date_from);
+        }
+
+        if ($request->filled('date_to')) {
+            $query->whereDate('created_at', '<=', $request->date_to);
+        }
+
+        $sort = $request->get('sort', 'newest');
+        if ($sort === 'oldest') {
+            $query->oldest();
+        } elseif ($sort === 'top_rated') {
+            $query->orderByDesc('ratings_avg_value');
+        } else {
+            $query->latest();
+        }
+
+        return MemeResource::collection($query->paginate(10));
+    }
+
+    public function today()
+    {
+        $ids = Meme::orderBy('id')->pluck('id');
+
+        if ($ids->isEmpty()) {
+            return response()->json(['data' => null]);
+        }
+
+        $index = (int) date('Ymd') % $ids->count();
+        $meme  = Meme::with(['user', 'tags', 'board'])
+                     ->withAvg('ratings', 'value')
+                     ->find($ids->get($index));
+
+        return new MemeResource($meme);
     }
 
     public function show(Meme $meme)
@@ -42,7 +80,10 @@ class MemeController extends Controller
         ]);
 
         if ($request->validated('tags')) {
-            $meme->tags()->sync($request->validated('tags'));
+            $tagIds = collect($request->validated('tags'))
+                ->map(fn($name) => Tag::firstOrCreate(['name' => trim($name)])->id)
+                ->toArray();
+            $meme->tags()->sync($tagIds);
         }
 
         return new MemeResource($meme->load(['tags', 'user', 'board']));

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, watch, computed } from "vue";
+import { ref, watch } from "vue";
 import { useApi } from "../composables/useApi";
 import { useAuth } from "../composables/useAuth";
 
@@ -21,8 +21,9 @@ const form = ref({
   is_anonymous: true,
   author_name: "",
   image: null as File | null,
-  tags: [] as number[],
 });
+
+const tagInput = ref("");
 
 const loading = ref(false);
 const error = ref("");
@@ -80,8 +81,8 @@ function resetForm() {
     is_anonymous: true,
     author_name: "",
     image: null,
-    tags: [],
   };
+  tagInput.value = "";
   error.value = "";
 }
 
@@ -118,9 +119,11 @@ async function submit() {
       fd.append("author_name", form.value.author_name.trim());
     }
     fd.append("image", form.value.image);
-    if (form.value.tags.length) {
-      form.value.tags.forEach((t) => fd.append("tags[]", String(t)));
-    }
+    const tags = tagInput.value
+      .split(",")
+      .map((t) => t.trim())
+      .filter((t) => t.length > 0);
+    tags.forEach((t) => fd.append("tags[]", t));
 
     const res = await postFile<{ data: any }>("/memes", fd);
     emit("threadCreated", res.data);
@@ -244,6 +247,24 @@ async function submit() {
                       Postmodern (2021–Present)
                     </option>
                   </select>
+                </div>
+
+                <!-- Tags -->
+                <div class="mm-field">
+                  <label>Tags <span class="mm-optional">(optional, comma-separated)</span></label>
+                  <input
+                    v-model="tagInput"
+                    type="text"
+                    placeholder="e.g. Programming, Cats, Reaction"
+                    maxlength="200"
+                  />
+                  <div v-if="tagInput.trim()" class="mm-tag-preview">
+                    <span
+                      v-for="tag in tagInput.split(',').map(t => t.trim()).filter(t => t)"
+                      :key="tag"
+                      class="mm-tag-chip"
+                    >{{ tag }}</span>
+                  </div>
                 </div>
 
                 <!-- Anonymous toggle -->
@@ -529,6 +550,21 @@ async function submit() {
   to {
     transform: rotate(360deg);
   }
+}
+
+.mm-tag-preview {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin-top: 6px;
+}
+.mm-tag-chip {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--orange);
+  background: var(--parchment);
+  border: 1px solid var(--grey-lt);
+  padding: 2px 7px;
 }
 
 .mm-resolving {

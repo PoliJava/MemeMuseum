@@ -9,7 +9,7 @@ class Board extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['slug', 'name', 'description', 'is_archived', 'is_readonly'];
+    protected $fillable = ['slug', 'name', 'description', 'sticky_body', 'is_archived', 'is_readonly'];
 
     protected $casts = [
         'is_archived' => 'boolean',

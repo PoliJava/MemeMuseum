@@ -53,8 +53,8 @@ function requireAuthThenPost(slug?: string) {
         </div>
         <nav class="header-nav">
           <router-link to="/">Collection</router-link>
-          <a href="#">Exhibitions</a>
-          <a href="#">About</a>
+          <router-link to="/search">Browse</router-link>
+          <a href="#" class="nav-aux">About</a>
 
           <a
             v-if="!user"

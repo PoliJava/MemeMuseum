@@ -11,6 +11,7 @@ interface Board {
   slug: string;
   name: string;
   description: string | null;
+  sticky_body: string | null;
   is_archived: boolean;
   is_readonly: boolean;
   memes_count: number;
@@ -50,7 +51,7 @@ const loading = ref(true);
 const error = ref("");
 const currentPage = ref(1);
 
-const API_BASE = import.meta.env.VITE_API_URL ?? "http://localhost:8000";
+const API_BASE = import.meta.env.VITE_API_URL ?? "";
 
 function imageUrl(path: string) {
   return `${API_BASE}/storage/${path}`;
@@ -157,6 +158,21 @@ onBeforeUnmount(() =>
     <div v-else-if="error" class="bv-error">{{ error }}</div>
 
     <template v-else>
+      <!-- Sticky post -->
+      <div v-if="board?.sticky_body" class="sticky-post">
+        <div class="sticky-header">
+          <span class="sticky-pin">[STICKY]</span>
+          <span class="sticky-name">Board Notice</span>
+        </div>
+        <div class="sticky-body">
+          <p
+            v-for="(line, i) in board.sticky_body.split('\n')"
+            :key="i"
+            :class="{ greentext: line.startsWith('>') }"
+          >{{ line }}</p>
+        </div>
+      </div>
+
       <!-- Empty state -->
       <div v-if="threads.length === 0" class="bv-empty">
         <p>No threads yet in this board.</p>
@@ -487,5 +503,58 @@ onBeforeUnmount(() =>
 .page-btn:disabled {
   opacity: 0.4;
   cursor: not-allowed;
+}
+
+/* ── Sticky post ── */
+.sticky-post {
+  background: #fffbe6;
+  border: 1px solid #e6d97a;
+  border-left: 4px solid #c8a800;
+  margin-bottom: 14px;
+}
+.sticky-header {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  padding: 6px 14px;
+  background: #fdf5c0;
+  border-bottom: 1px solid #e6d97a;
+  font-size: 11px;
+}
+.sticky-pin {
+  font-family: var(--font-mono);
+  font-weight: bold;
+  color: #8a7000;
+  letter-spacing: 1px;
+}
+.sticky-name {
+  font-family: var(--font-sans);
+  font-weight: bold;
+  color: #5c4a00;
+  font-size: 12px;
+}
+.sticky-body {
+  padding: 10px 14px;
+}
+.sticky-body p {
+  font-size: 13px;
+  line-height: 1.55;
+  margin: 2px 0;
+  color: var(--espresso);
+  white-space: pre-wrap;
+}
+.sticky-body .greentext { color: #789922; }
+
+@media (max-width: 600px) {
+  .catalog-row { padding: 10px; gap: 10px; }
+  .catalog-thumb { width: 70px; }
+  .catalog-img { width: 70px; height: 56px; }
+  .catalog-img-placeholder { width: 70px; height: 56px; }
+  .catalog-stats { flex-wrap: wrap; gap: 8px; }
+}
+
+@media (max-width: 400px) {
+  .board-header { padding: 8px 10px; }
+  .pagination { padding: 0 10px; }
 }
 </style>

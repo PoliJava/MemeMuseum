@@ -1,4 +1,5 @@
 import { ref } from "vue";
+import { csrf, xsrfToken } from "./useCSRF";
 
 export interface AuthUser {
   id: number;
@@ -9,20 +10,7 @@ export interface AuthUser {
 const user = ref<AuthUser | null>(null);
 const loading = ref(false);
 
-const API = import.meta.env.VITE_API_URL ?? "http://localhost:8000";
-
-async function csrf(): Promise<void> {
-  await fetch(`${API}/sanctum/csrf-cookie`, { credentials: "include" });
-}
-
-function xsrfToken(): string {
-  return decodeURIComponent(
-    document.cookie
-      .split("; ")
-      .find((r) => r.startsWith("XSRF-TOKEN="))
-      ?.split("=")[1] ?? "",
-  );
-}
+const API = import.meta.env.VITE_API_URL ?? "";
 
 async function apiFetch<T>(
   path: string,
@@ -95,9 +83,9 @@ async function logout(): Promise<void> {
 }
 
 async function fetchUser(): Promise<void> {
+  await csrf()
   try {
     const res = await fetch(`${API}/api/user`, {
-      // was API_BASE — now consistent with API
       credentials: "include",
       headers: {
         Accept: "application/json",

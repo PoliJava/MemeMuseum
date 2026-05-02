@@ -312,6 +312,29 @@ main {
 
 @media (max-width: 768px) {
   .content-grid { grid-template-columns: 1fr; }
+
+  /* Boards table: drop thread-count and status columns */
+  .boards-table-head,
+  .board-row { grid-template-columns: 64px 1fr; }
+  .boards-table-head .col-right,
+  .board-row .col-right { display: none; }
+
+  main { padding: 16px 12px 32px; }
+
+  .hero-banner { padding: 36px 16px 32px; }
+  .deco-frame { display: none; }
+}
+
+@media (max-width: 540px) {
+  .header-inner { padding: 8px 12px; gap: 10px; }
+  .nav-aux { display: none; }
+  .header-nav { gap: 2px; }
+  .header-nav a { padding: 4px 8px; font-size: 11px; }
+}
+
+@media (max-width: 400px) {
+  .header-inner { flex-wrap: wrap; }
+  .header-nav { width: 100%; }
 }
 
 /* ─────────────────────────────────────────────

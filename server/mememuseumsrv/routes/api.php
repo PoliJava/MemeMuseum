@@ -38,6 +38,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
 // Public meme browsing
 Route::get('/memes',        [MemeController::class, 'index']);
+Route::get('/memes/today',  [MemeController::class, 'today']);
 Route::get('/memes/{meme}', [MemeController::class, 'show']);
 Route::get('/tags/popular', [TagController::class, 'popular']);
 

@@ -23,7 +23,7 @@ class StoreRequest extends FormRequest
             'is_anonymous' => 'boolean',
             'author_name'  => 'nullable|string|max:64|required_if:is_anonymous,true',
             'tags'         => 'array',
-            'tags.*'       => 'exists:tags,id',
+            'tags.*'       => 'string|max:50',
         ];
     }
 }

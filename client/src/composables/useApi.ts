@@ -1,13 +1,6 @@
-const API_BASE = import.meta.env.VITE_API_URL ?? 'http://localhost:8000'
+import { csrf, xsrfToken } from './useCSRF'
 
-async function csrf() {
-  await fetch(`${API_BASE}/sanctum/csrf-cookie`, { credentials: 'include' })
-}
-
-function xsrfToken(): string {
-  const match = document.cookie.match(/XSRF-TOKEN=([^;]+)/)
-  return match ? decodeURIComponent(match[1]) : ''
-}
+const API_BASE = import.meta.env.VITE_API_URL ?? ''
 
 async function request<T>(
   method: string,
