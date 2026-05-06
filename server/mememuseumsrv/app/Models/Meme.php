@@ -12,6 +12,7 @@ class Meme extends Model
 
     protected $fillable = [
         'title',
+        'body',
         'image_path',
         'user_id',
         'board_id',

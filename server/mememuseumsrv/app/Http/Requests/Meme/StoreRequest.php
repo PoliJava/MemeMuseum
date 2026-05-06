@@ -17,11 +17,12 @@ class StoreRequest extends FormRequest
     {
         return [
             'title'        => 'required|string|max:255',
+            'body'         => 'nullable|string',
             'image'        => 'required|image|max:2048',
             'age'          => ['required', new Enum(MemeAge::class)],
             'board_id'     => 'required|exists:boards,id',
             'is_anonymous' => 'boolean',
-            'author_name'  => 'nullable|string|max:64|required_if:is_anonymous,true',
+            'author_name'  => 'nullable|string|max:64',
             'tags'         => 'array',
             'tags.*'       => 'string|max:50',
         ];

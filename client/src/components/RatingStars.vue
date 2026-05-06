@@ -3,13 +3,17 @@ import { ref, watch } from 'vue'
 import { useApi } from '../composables/useApi'
 import { useAuth } from '../composables/useAuth'
 
-const props = defineProps<{ memeId: number; initialRating: number | null }>()
+const props = defineProps<{
+  memeId: number
+  initialRating: number | null
+  myRating?: number | null
+}>()
 const { post, del } = useApi()
 const { user } = useAuth()
 
 const rating = ref(props.initialRating || 0)
 const hover = ref(0)
-const userRating = ref<number | null>(null)
+const userRating = ref<number | null>(props.myRating ?? null)
 
 async function setRating(value: number) {
   if (!user.value) return

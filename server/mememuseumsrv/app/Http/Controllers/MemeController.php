@@ -71,6 +71,7 @@ class MemeController extends Controller
 
         $meme = Meme::create([
             'title'        => $request->validated('title'),
+            'body'         => $request->validated('body'),
             'image_path'   => $path,
             'age'          => $request->validated('age'),
             'user_id'      => $request->user()->id,

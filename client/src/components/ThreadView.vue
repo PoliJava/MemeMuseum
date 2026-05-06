@@ -23,6 +23,7 @@ interface Thread {
   author_name: string | null;
   user?: { name: string };
   avg_rating: number | null;
+  my_rating?: number | null;
   views_count: number;
   created_at: string;
   comments?: Comment[];
@@ -99,6 +100,7 @@ function handleReplyCreated(newReply: Comment) {
         <RatingStars
           :meme-id="Number(props.id)"
           :initial-rating="thread?.avg_rating ?? null"
+          :my-rating="thread?.my_rating ?? null"
         />
         <button class="reply-btn" @click="showReplyModal = true">
           [Reply]

@@ -19,6 +19,7 @@ class MemeResource extends JsonResource
         return [
             'id'             => $this->id,
             'title'          => $this->title,
+            'body'           => $this->body,
             'image_path'     => $this->image_path,
             'age'            => $this->age->value,
             'views_count'    => $this->views_count,
@@ -29,6 +30,10 @@ class MemeResource extends JsonResource
             'tags'           => TagResource::collection($this->whenLoaded('tags')),
             'comments'       => CommentResource::collection($this->whenLoaded('comments')),
             'avg_rating'     => $avg,
+            'my_rating'      => $this->when(
+                $request->user() && $this->relationLoaded('ratings'),
+                fn() => $this->ratings->where('user_id', $request->user()->id)->first()?->value
+            ),
             'ratings_count'  => $this->whenCounted('ratings'),
             'comments_count' => $this->whenCounted('comments'),
             'created_at'     => $this->created_at,
