@@ -25,7 +25,7 @@ export default defineConfig({
     },
     {
       command: 'php artisan serve',
-      cwd: '../server/mememuseumsrv',
+      cwd: '../server',
       url: 'http://localhost:8000',
       reuseExistingServer: true,
       timeout: 30_000,
