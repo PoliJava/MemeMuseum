@@ -28,7 +28,14 @@ class MemeResource extends JsonResource
             'user'           => UserResource::make($this->whenLoaded('user')),
             'board'          => BoardResource::make($this->whenLoaded('board')),
             'tags'           => TagResource::collection($this->whenLoaded('tags')),
-            'comments'       => CommentResource::collection($this->whenLoaded('comments')),
+            'comments'         => CommentResource::collection($this->whenLoaded('comments')),
+            // Board-view preview: last 3 replies in chronological order
+            'preview_comments' => $this->when(
+                $this->relationLoaded('previewComments'),
+                fn() => CommentResource::collection(
+                    $this->previewComments->take(3)->reverse()->values()
+                )
+            ),
             'avg_rating'     => $avg,
             'my_rating'      => $this->when(
                 $request->user() && $this->relationLoaded('ratings'),

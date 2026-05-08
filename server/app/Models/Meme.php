@@ -47,6 +47,12 @@ class Meme extends Model
         return $this->hasMany(Comment::class);
     }
 
+    // Last few comments for board-view previews (loaded separately from the full comments list)
+    public function previewComments()
+    {
+        return $this->hasMany(Comment::class)->with('user')->latest();
+    }
+
     public function ratings()
     {
         return $this->hasMany(Rating::class);

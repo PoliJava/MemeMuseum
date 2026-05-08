@@ -17,6 +17,7 @@ class UpdateRequest extends FormRequest
     {
         return [
             'title'        => 'sometimes|string|max:255',
+            'body'         => 'sometimes|nullable|string',
             'age'          => ['sometimes', new Enum(MemeAge::class)],
             'board_id'     => 'sometimes|exists:boards,id',
             'is_anonymous' => 'boolean',

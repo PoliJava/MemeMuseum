@@ -2,7 +2,6 @@
 
 use App\Http\Controllers\MemeController;
 use App\Http\Controllers\CommentController;
-use App\Http\Controllers\VoteController;
 use App\Http\Controllers\TagController;
 use App\Http\Controllers\AuthController;
 use Illuminate\Support\Facades\Route;
@@ -28,15 +27,16 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('/memes/{meme}',  [MemeController::class, 'destroy']);
 
     // Comments
-    Route::post('/comments',              [CommentController::class, 'store']);
-    Route::delete('/comments/{comment}',  [CommentController::class, 'destroy']);
+    Route::post('/comments',             [CommentController::class, 'store']);
+    Route::put('/comments/{comment}',    [CommentController::class, 'update']);
+    Route::delete('/comments/{comment}', [CommentController::class, 'destroy']);
 
     // Tags
     Route::post('/memes/{meme}/tags',            [TagController::class, 'attach']);
     Route::delete('/memes/{meme}/tags/{tag}',    [TagController::class, 'detach']);
 });
 
-// Public meme browsing
+// Public meme browsing — /today must come before /{meme} to avoid wildcard capture
 Route::get('/memes',        [MemeController::class, 'index']);
 Route::get('/memes/today',  [MemeController::class, 'today']);
 Route::get('/memes/{meme}', [MemeController::class, 'show']);
@@ -46,9 +46,4 @@ Route::get('/tags/popular', [TagController::class, 'popular']);
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/ratings', [RatingController::class, 'store']);
     Route::delete('/ratings/{meme}', [RatingController::class, 'destroy']);
-});
-
-Route::middleware('auth:sanctum')->group(function () {
-    Route::post('/memes/{meme}/tags', [TagController::class, 'attach']);
-    Route::delete('/memes/{meme}/tags/{tag}', [TagController::class, 'detach']);
 });

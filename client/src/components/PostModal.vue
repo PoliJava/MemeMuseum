@@ -17,7 +17,7 @@ const resolvingBoard = ref(false);
 const form = ref({
   title: "",
   body: "",
-  age: "Modern (2017-2020)",
+  age: "Modern (2017 - 2020)",
   is_anonymous: true,
   author_name: "",
   image: null as File | null,
@@ -77,7 +77,7 @@ function resetForm() {
   form.value = {
     title: "",
     body: "",
-    age: "modern",
+    age: "Modern (2017 - 2020)",
     is_anonymous: true,
     author_name: "",
     image: null,

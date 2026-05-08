@@ -18,11 +18,11 @@ class BoardController extends Controller
     public function show(Board $board)
     {
         $memes = $board->memes()
-            ->with(['user', 'tags'])
-            ->withCount('comments')    
+            ->with(['user', 'tags', 'previewComments'])
+            ->withCount('comments')
             ->withAvg('ratings', 'value')
             ->latest()
-            ->paginate(15);
+            ->paginate(10);
 
         return MemeResource::collection($memes)
             ->additional(['board' => new BoardResource($board)]);
