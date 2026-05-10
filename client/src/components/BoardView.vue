@@ -1,9 +1,10 @@
-<script setup lang="ts">
+﻿<script setup lang="ts">
 import { ref, onMounted, onBeforeUnmount, watch } from "vue";
 import { useApi } from "../composables/useApi";
 import { useAuth } from "../composables/useAuth";
 import { usePostModal } from "../composables/usePostModal";
 import { useFormatDate } from "../composables/useFormatDate";
+import { formatPostNo } from "../composables/useFormatId";
 import RatingStars from "./RatingStars.vue";
 
 interface Board {
@@ -176,7 +177,7 @@ onBeforeUnmount(() => window.removeEventListener(REFRESH_EVENT, requestRefresh))
               <span class="post-subject">{{ thread.title }}</span>
               <span class="post-name">{{ displayName(thread) }}</span>
               <span class="post-date">{{ formatPostDate(thread.created_at) }}</span>
-              <span class="post-no">No.{{ thread.id }}</span>
+              <span class="post-no">No.{{ formatPostNo(thread.id) }}</span>
               <router-link :to="`/thread/${thread.id}`" class="post-reply-link">[Reply]</router-link>
             </div>
 
@@ -227,10 +228,12 @@ onBeforeUnmount(() => window.removeEventListener(REFRESH_EVENT, requestRefresh))
               <div class="reply-header">
                 <span class="post-name">{{ reply.display_name }}</span>
                 <span class="post-date">{{ formatPostDate(reply.created_at) }}</span>
-                <span class="post-no">No.{{ reply.id }}</span>
-                <a v-if="reply.parent_id" :href="`/thread/${thread.id}#post-${reply.parent_id}`" class="reply-backlink">
-                  &gt;&gt;{{ reply.parent_id }}
-                </a>
+                <span class="post-no">No.{{ formatPostNo(reply.id) }}</span>
+                <router-link
+                v-if="reply.parent_id"
+                :to="{ path: `/thread/${thread.id}`, hash: `#post-${reply.parent_id}` }"
+                class="reply-backlink"
+              >&gt;&gt;{{ reply.parent_id }}</router-link>
               </div>
 
               <div v-if="reply.image_path" class="reply-image-wrap">
@@ -270,14 +273,14 @@ onBeforeUnmount(() => window.removeEventListener(REFRESH_EVENT, requestRefresh))
 </template>
 
 <style scoped>
-/* ── Page wrapper ── */
+/* Page wrapper*/
 .board-page {
   max-width: 900px;
   margin: 0 auto;
   padding: 0 0 40px;
 }
 
-/* ── Board header bar ── */
+/* Board header bar*/
 .board-header {
   display: flex;
   align-items: center;
@@ -322,7 +325,7 @@ onBeforeUnmount(() => window.removeEventListener(REFRESH_EVENT, requestRefresh))
   padding: 2px 7px;
 }
 
-/* ── New thread button ── */
+/* New thread button*/
 .btn-new-thread {
   background: var(--orange);
   color: #fff;
@@ -338,7 +341,7 @@ onBeforeUnmount(() => window.removeEventListener(REFRESH_EVENT, requestRefresh))
 .btn-new-thread:hover:not(:disabled) { background: var(--orange-lt); }
 .btn-new-thread:disabled { opacity: 0.45; cursor: not-allowed; }
 
-/* ── Status messages ── */
+/* Status messages*/
 .bv-loading, .bv-empty {
   padding: 40px;
   text-align: center;
@@ -355,7 +358,7 @@ onBeforeUnmount(() => window.removeEventListener(REFRESH_EVENT, requestRefresh))
   border-left: 3px solid var(--orange);
 }
 
-/* ── Thread list ── */
+/* Thread list*/
 .thread-list {
   display: flex;
   flex-direction: column;
@@ -368,7 +371,7 @@ onBeforeUnmount(() => window.removeEventListener(REFRESH_EVENT, requestRefresh))
 }
 .thread-block:last-child { border-bottom: none; }
 
-/* ── OP post ── */
+/* OP post*/
 .op-post {
   background: var(--cream-dark);
   border: 1px solid var(--grey-lt);
@@ -466,7 +469,7 @@ onBeforeUnmount(() => window.removeEventListener(REFRESH_EVENT, requestRefresh))
 }
 .view-thread-btn:hover { text-decoration: underline; }
 
-/* ── Preview replies — flat, same depth as OP ── */
+/* Preview replies*/
 .preview-replies {
   padding-bottom: 12px;
 }
@@ -526,7 +529,7 @@ onBeforeUnmount(() => window.removeEventListener(REFRESH_EVENT, requestRefresh))
   font-family: var(--font-mono);
 }
 
-/* ── Sticky ── */
+/* Sticky*/
 .sticky-post {
   background: #fffbe6;
   border: 1px solid #e6d97a;
@@ -564,7 +567,7 @@ onBeforeUnmount(() => window.removeEventListener(REFRESH_EVENT, requestRefresh))
 }
 .sticky-body .greentext { color: #789922; }
 
-/* ── Pagination ── */
+/* Pagination*/
 .pagination {
   display: flex;
   gap: 4px;
@@ -586,7 +589,7 @@ onBeforeUnmount(() => window.removeEventListener(REFRESH_EVENT, requestRefresh))
 .page-btn--active { background: var(--espresso); color: var(--cream); border-color: var(--espresso); }
 .page-btn:disabled { opacity: 0.4; cursor: not-allowed; }
 
-/* ── Responsive ── */
+/* Responsive*/
 @media (max-width: 600px) {
   .op-image-wrap { float: none; margin: 0 0 8px 0; }
   .op-image { max-width: 100%; }

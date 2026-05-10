@@ -22,6 +22,10 @@ class MemeController extends Controller
             $query->whereHas('tags', fn($q) => $q->where('name', $request->tag));
         }
 
+        if ($request->filled('board')) {
+            $query->whereHas('board', fn($q) => $q->where('slug', $request->board));
+        }
+
         if ($request->filled('date_from')) {
             $query->whereDate('created_at', '>=', $request->date_from);
         }
@@ -34,7 +38,7 @@ class MemeController extends Controller
         if ($sort === 'oldest') {
             $query->oldest();
         } elseif ($sort === 'top_rated') {
-            $query->orderByDesc('ratings_avg_value');
+            $query->orderByRaw('ratings_avg_value DESC NULLS LAST');
         } else {
             $query->latest();
         }
@@ -60,8 +64,8 @@ class MemeController extends Controller
 
     public function show(Meme $meme)
     {
-        $meme->load(['user', 'tags', 'board', 'comments.user', 'ratings']);
-        $meme->incrementViews(); // Aumenta il contatore visualizzazioni
+        $meme->load(['user', 'tags', 'board', 'comments.user', 'ratings', 'favorites']);
+        $meme->incrementViews();
         return new MemeResource($meme);
     }
 
@@ -96,8 +100,12 @@ class MemeController extends Controller
         return new MemeResource($meme->load(['tags', 'user', 'board']));
     }
 
-    public function destroy(Meme $meme)
+    public function destroy(Request $request, Meme $meme)
     {
+        if ($meme->user_id !== $request->user()->id) {
+            return response()->json(['message' => 'Forbidden.'], 403);
+        }
+
         $meme->delete();
         return response()->json(['message' => 'Meme deleted']);
     }

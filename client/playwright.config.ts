@@ -6,6 +6,8 @@ export default defineConfig({
   retries: 1,
   reporter: [['html', { open: 'never' }], ['list']],
 
+  expect: { timeout: 10_000 },
+
   use: {
     baseURL: 'http://localhost:5173',
     trace: 'on-first-retry',

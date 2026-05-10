@@ -58,6 +58,11 @@ class Meme extends Model
         return $this->hasMany(Rating::class);
     }
 
+    public function favorites()
+    {
+        return $this->hasMany(Favorite::class);
+    }
+
     // Media voti (arrotondata a 0.5)
     public function getAvgRatingAttribute(): ?float
     {

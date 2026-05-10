@@ -9,16 +9,6 @@ use App\Http\Resources\CommentResource;
 
 class CommentController extends Controller
 {
-    /**
-     * Store a newly created comment in storage.
-     *
-     * Expects:
-     *   meme_id      int      required
-     *   body         string   required
-     *   parent_id    int|null optional – for threaded replies
-     *   is_anonymous bool     optional (default true)
-     *   author_name  string   optional – shown when is_anonymous
-     */
     public function store(Request $request): JsonResponse
     {
         $data = $request->validate([
@@ -37,7 +27,7 @@ class CommentController extends Controller
             ], 422);
         }
 
-        // Validate that parent_id (if given) belongs to the same meme
+        // parent must belong to the same thread
         if (!empty($data['parent_id'])) {
             $parent = Comment::find($data['parent_id']);
             if ($parent && $parent->meme_id !== (int) $data['meme_id']) {
@@ -61,7 +51,6 @@ class CommentController extends Controller
             'author_name'  => $data['author_name'] ?? null,
         ]);
 
-        // Load user so CommentResource can populate display_name correctly
         $comment->load('user');
 
         return (new CommentResource($comment))
@@ -69,9 +58,6 @@ class CommentController extends Controller
             ->setStatusCode(201);
     }
 
-    /**
-     * Update a comment's body. Only the author may edit their own comment.
-     */
     public function update(Request $request, Comment $comment): JsonResponse
     {
         if ($comment->user_id !== $request->user()->id) {
@@ -85,12 +71,9 @@ class CommentController extends Controller
         $comment->update(['body' => $data['body']]);
         $comment->load('user');
 
-        return new CommentResource($comment);
+        return (new CommentResource($comment))->response();
     }
 
-    /**
-     * Delete a comment. Only the author may delete their own comment.
-     */
     public function destroy(Comment $comment): JsonResponse
     {
         if ($comment->user_id !== request()->user()->id) {

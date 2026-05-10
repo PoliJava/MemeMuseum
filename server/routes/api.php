@@ -8,6 +8,8 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
 use App\Http\Controllers\BoardController;
 use App\Http\Controllers\RatingController;
+use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\FavoriteController;
 
 // Auth
 Route::post('/register', [AuthController::class, 'register']);
@@ -20,6 +22,14 @@ Route::get('/boards/{board}', [BoardController::class, 'show']);
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::get('/user',    fn(Request $r) => response()->json($r->user()));
+
+    // Profile
+    Route::get('/profile',        [ProfileController::class, 'show']);
+    Route::post('/profile/avatar', [ProfileController::class, 'updateAvatar']);
+
+    // Favorites
+    Route::post('/favorites',          [FavoriteController::class, 'store']);
+    Route::delete('/favorites/{meme}', [FavoriteController::class, 'destroy']);
 
     // Memes
     Route::post('/memes',           [MemeController::class, 'store']);

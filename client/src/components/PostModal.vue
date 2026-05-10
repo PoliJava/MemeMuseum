@@ -113,7 +113,7 @@ async function submit() {
     fd.append("title", form.value.title.trim());
     fd.append("body", form.value.body);
     fd.append("age", form.value.age);
-    fd.append("board_id", String(resolvedBoardId.value)); // numeric ID — StoreRequest: exists:boards,id
+    fd.append("board_id", String(resolvedBoardId.value));
     fd.append("is_anonymous", form.value.is_anonymous ? "1" : "0");
     if (form.value.is_anonymous && form.value.author_name.trim()) {
       fd.append("author_name", form.value.author_name.trim());
@@ -275,7 +275,7 @@ async function submit() {
                   </label>
                 </div>
 
-                <!-- Author name — shown when anonymous (server: required_if:is_anonymous,true but nullable) -->
+                <!-- Author name (only when posting anonymously) -->
                 <div v-if="form.is_anonymous" class="mm-field">
                   <label
                     >Display name

@@ -9,9 +9,7 @@ class MemeResource extends JsonResource
 {
     public function toArray(Request $request): array
     {
-        // avg_rating: prefer the pre-aggregated value injected by withAvg('ratings', 'value')
-        // which Laravel puts in $this->ratings_avg_value. Falls back to the model accessor
-        // (which fires an extra query) only when the meme is loaded individually via show().
+        // withAvg() result; falls back to the accessor for single-meme show()
         $avg = $this->ratings_avg_value !== null
             ? round((float) $this->ratings_avg_value * 2) / 2   // match the accessor's 0.5 rounding
             : $this->avg_rating;                                 // accessor — fine for single-meme show()
@@ -40,6 +38,10 @@ class MemeResource extends JsonResource
             'my_rating'      => $this->when(
                 $request->user() && $this->relationLoaded('ratings'),
                 fn() => $this->ratings->where('user_id', $request->user()->id)->first()?->value
+            ),
+            'is_favorited'   => $this->when(
+                $request->user() && $this->relationLoaded('favorites'),
+                fn() => $this->favorites->contains('user_id', $request->user()->id)
             ),
             'ratings_count'  => $this->whenCounted('ratings'),
             'comments_count' => $this->whenCounted('comments'),

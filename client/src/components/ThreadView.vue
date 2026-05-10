@@ -4,8 +4,10 @@ import { useRouter } from "vue-router";
 import { useApi } from "../composables/useApi";
 import { useAuth } from "../composables/useAuth";
 import { useFormatDate } from "../composables/useFormatDate";
+import { formatPostNo } from "../composables/useFormatId";
 import RatingStars from "./RatingStars.vue";
 import ReplyModal from "./ReplyModal.vue";
+import FavoriteButton from "./FavoriteButton.vue";
 
 interface CommentAuthor {
   id: number;
@@ -33,6 +35,7 @@ interface Thread {
   user?: { id: number; name: string };
   avg_rating: number | null;
   my_rating?: number | null;
+  is_favorited?: boolean;
   views_count: number;
   created_at: string;
   comments?: Comment[];
@@ -48,12 +51,11 @@ const thread = ref<Thread | null>(null);
 const replies = ref<Comment[]>([]);
 const loading = ref(true);
 
-// ── Reply modal ──────────────────────────────
 const showReplyModal = ref(false);
 const replyParentId = ref<number | null>(null);
 const replyInitialBody = ref("");
 
-// parentId = DB parent for threading; initialBody = >>X pre-fill in textarea
+// >>N pre-fill for the textarea
 function openReply(parentId: number | null = null, initialBody = "") {
   replyParentId.value = parentId;
   replyInitialBody.value = initialBody;
@@ -65,7 +67,6 @@ function handleReplyCreated(newReply: Comment) {
   showReplyModal.value = false;
 }
 
-// ── Body rendering — turns >>X tokens into anchor links ──
 interface BodyPart {
   text: string;
   href: string | null;
@@ -78,7 +79,6 @@ function parseBodyLine(line: string): BodyPart[] {
   })
 }
 
-// ── Inline comment edit ──────────────────────
 const editingId = ref<number | null>(null);
 const editBody = ref("");
 const editLoading = ref(false);
@@ -115,7 +115,6 @@ async function saveEdit(id: number) {
   }
 }
 
-// ── Delete comment ───────────────────────────
 const deletingIds = ref<number[]>([]);
 
 async function deleteComment(id: number) {
@@ -131,7 +130,6 @@ async function deleteComment(id: number) {
   }
 }
 
-// ── Delete meme ──────────────────────────────
 const deletingMeme = ref(false);
 
 async function deleteMeme() {
@@ -146,7 +144,6 @@ async function deleteMeme() {
   }
 }
 
-// ── Ownership ────────────────────────────────
 function isOwnComment(c: Comment) {
   return !!user.value && !!c.user && c.user.id === user.value.id;
 }
@@ -154,7 +151,6 @@ function isOwnThread() {
   return !!user.value && !!thread.value?.user && thread.value.user.id === user.value.id;
 }
 
-// ── Fetch ────────────────────────────────────
 async function fetchThread() {
   loading.value = true;
   try {
@@ -186,9 +182,9 @@ onMounted(fetchThread);
         <!-- Clickable No.X — quotes this post -->
         <span
           class="post-no post-no--link"
-          :title="`Click to quote No.${thread?.id}`"
+          :title="`Click to quote No.${formatPostNo(thread!.id)}`"
           @click="user && openReply(null, `>>${thread!.id}\n`)"
-        >No.{{ thread?.id }}</span>
+        >No.{{ formatPostNo(thread!.id) }}</span>
         <button v-if="user" class="inline-btn" @click="openReply(null)">[Reply]</button>
         <button
           v-if="isOwnThread()"
@@ -220,6 +216,11 @@ onMounted(fetchThread);
           :initial-rating="thread?.avg_rating ?? null"
           :my-rating="thread?.my_rating ?? null"
         />
+        <FavoriteButton
+          v-if="user"
+          :meme-id="Number(props.id)"
+          :initial="thread?.is_favorited ?? false"
+        />
         <span class="post-views">{{ thread?.views_count }} views</span>
       </div>
     </div>
@@ -238,9 +239,9 @@ onMounted(fetchThread);
           <!-- Clickable No.X quotes this reply -->
           <span
             class="post-no post-no--link"
-            :title="`Click to quote No.${reply.id}`"
+            :title="`Click to quote No.${formatPostNo(reply.id)}`"
             @click="user && openReply(reply.id, `>>${reply.id}\n`)"
-          >No.{{ reply.id }}</span>
+          >No.{{ formatPostNo(reply.id) }}</span>
           <!-- Backlink to the post this is replying to -->
           <a v-if="reply.parent_id" :href="`#post-${reply.parent_id}`" class="quote-link">
             &gt;&gt;{{ reply.parent_id }}
@@ -309,7 +310,7 @@ onMounted(fetchThread);
   letter-spacing: 1px;
 }
 
-/* ── OP ── */
+/* OP post */
 .op-post {
   background: var(--cream-dark);
   padding: 12px 16px;
@@ -317,7 +318,7 @@ onMounted(fetchThread);
   border: 1px solid var(--grey-lt);
 }
 
-/* ── Replies — all at the same level ── */
+/* Replies */
 .reply-post {
   background: #fff;
   padding: 8px 14px;
@@ -325,7 +326,7 @@ onMounted(fetchThread);
   border: 1px solid var(--grey-lt);
 }
 
-/* ── Shared header ── */
+/* Post header */
 .post-header {
   display: flex;
   align-items: baseline;
@@ -387,7 +388,7 @@ onMounted(fetchThread);
   margin-left: 2px;
 }
 
-/* ── Media ── */
+/* Media */
 .post-media { margin: 6px 0; }
 .post-image {
   max-width: 100%;
@@ -398,7 +399,7 @@ onMounted(fetchThread);
 }
 .post-image--reply { max-height: 280px; }
 
-/* ── Body text ── */
+/* Body text */
 .post-body p {
   margin: 2px 0;
   font-size: 13px;
@@ -414,7 +415,7 @@ onMounted(fetchThread);
 }
 .quote-link:hover { text-decoration: underline; }
 
-/* ── OP meta bar ── */
+/* OP meta bar */
 .post-meta {
   display: flex;
   gap: 14px;
@@ -430,7 +431,7 @@ onMounted(fetchThread);
   color: var(--grey);
 }
 
-/* ── Inline edit ── */
+/* Inline edit */
 .edit-area { margin: 6px 0; }
 .edit-textarea {
   width: 100%;

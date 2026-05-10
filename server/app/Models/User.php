@@ -11,12 +11,11 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 
-#[Fillable(['name', 'email', 'password'])]
+#[Fillable(['name', 'email', 'password', 'avatar_path'])]
 #[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable
 {
     /** @use HasFactory<UserFactory> */
-    use HasFactory, Notifiable;
     use HasApiTokens, HasFactory, Notifiable;
 
 
@@ -40,12 +39,12 @@ class User extends Authenticatable
         return $this->hasMany(Comment::class);
     }
 
-    public function votes(){
-        return $this->hasMany(Vote::class);
-    }
-
     public function ratings(){
         return $this->hasMany(Rating::class);
+    }
+
+    public function favorites(){
+        return $this->hasMany(Favorite::class);
     }
 
     }

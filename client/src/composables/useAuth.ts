@@ -1,7 +1,7 @@
 import { ref } from "vue";
 import { csrf, xsrfToken } from "./useCSRF";
 
-export interface AuthUser {
+interface AuthUser {
   id: number;
   name: string;
   email: string;

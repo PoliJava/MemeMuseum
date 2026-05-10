@@ -1,16 +1,18 @@
-<script setup lang="ts">
-import { ref, watch } from 'vue'
+﻿<script setup lang="ts">
+import { ref, watch, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useApi } from '../composables/useApi'
 import { useFormatDate } from '../composables/useFormatDate'
 
 interface Tag { id: number; name: string }
+interface Board { slug: string; name: string }
 interface Meme {
   id: number
   title: string
   image_path: string | null
   avg_rating: number | null
   tags: Tag[]
+  board?: { slug: string; name: string }
   created_at: string
   views_count: number
   comments_count: number
@@ -28,6 +30,9 @@ const tag      = ref('')
 const dateFrom = ref('')
 const dateTo   = ref('')
 const sort     = ref('newest')
+const board    = ref('')
+
+const boards = ref<Board[]>([])
 
 const memes   = ref<Meme[]>([])
 const meta    = ref<Meta | null>(null)
@@ -38,6 +43,13 @@ function imageUrl(path: string) {
   return `${API_BASE}/storage/${path}`
 }
 
+async function fetchBoards() {
+  try {
+    const res = await get<{ data: Board[] }>('/boards')
+    boards.value = res.data
+  } catch {}
+}
+
 async function fetchResults(page = 1) {
   loading.value = true
   error.value   = ''
@@ -46,6 +58,7 @@ async function fetchResults(page = 1) {
     if (tag.value)      params.set('tag',       tag.value)
     if (dateFrom.value) params.set('date_from', dateFrom.value)
     if (dateTo.value)   params.set('date_to',   dateTo.value)
+    if (board.value)    params.set('board',     board.value)
 
     const res = await get<{ data: Meme[]; meta: Meta }>(`/memes?${params}`)
     memes.value = res.data
@@ -62,9 +75,12 @@ function search() {
   if (tag.value)      query.tag       = tag.value
   if (dateFrom.value) query.date_from = dateFrom.value
   if (dateTo.value)   query.date_to   = dateTo.value
+  if (board.value)    query.board     = board.value
   if (sort.value !== 'newest') query.sort = sort.value
   router.push({ path: '/search', query })
 }
+
+onMounted(fetchBoards)
 
 function goPage(page: number) {
   router.push({ path: '/search', query: { ...route.query, page: String(page) } })
@@ -78,6 +94,7 @@ watch(
     dateFrom.value = (q.date_from as string) ?? ''
     dateTo.value   = (q.date_to   as string) ?? ''
     sort.value     = (q.sort      as string) ?? 'newest'
+    board.value    = (q.board     as string) ?? ''
     fetchResults(Number(q.page) || 1)
   },
   { immediate: true },
@@ -103,6 +120,15 @@ watch(
           placeholder="e.g. Programming"
           @keydown.enter.prevent="search"
         />
+      </div>
+      <div class="filter-group">
+        <label>Board</label>
+        <select v-model="board">
+          <option value="">All boards</option>
+          <option v-for="b in boards" :key="b.slug" :value="b.slug">
+            /{{ b.slug }}/
+          </option>
+        </select>
       </div>
       <div class="filter-group">
         <label>From</label>
@@ -150,6 +176,11 @@ watch(
           <div class="sr-meta">
             <span class="sr-date">{{ formatPostDate(meme.created_at) }}</span>
             <span class="sr-id">No.{{ meme.id }}</span>
+            <button
+              v-if="meme.board"
+              class="sr-board-link"
+              @click.prevent="board = meme.board!.slug; search()"
+            >/{{ meme.board.slug }}/</button>
           </div>
           <router-link :to="`/thread/${meme.id}`" class="sr-title">
             {{ meme.title }}
@@ -199,7 +230,7 @@ watch(
 <style scoped>
 .search-page { max-width: 900px; margin: 0 auto; padding-bottom: 40px; }
 
-/* ── Filter form ── */
+/* Filter form*/
 .search-filters {
   display: flex;
   flex-wrap: wrap;
@@ -259,7 +290,7 @@ watch(
 }
 .btn-search:hover { background: var(--orange-lt); }
 
-/* ── Status / count ── */
+/* Status / count*/
 .sr-status {
   padding: 40px;
   text-align: center;
@@ -285,7 +316,7 @@ watch(
   background: var(--cream-dark);
 }
 
-/* ── Result rows ── */
+/* Result rows*/
 .sr-results {
   border: 1px solid var(--grey-lt);
   background: #fff;
@@ -314,6 +345,18 @@ watch(
 .sr-meta { display: flex; gap: 10px; font-size: 11px; flex-wrap: wrap; }
 .sr-date { font-family: var(--font-mono); color: var(--grey-dk); font-size: 10px; }
 .sr-id   { font-family: var(--font-mono); color: var(--grey);    font-size: 10px; }
+.sr-board-link {
+  background: none;
+  border: none;
+  padding: 0;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: bold;
+  color: var(--orange);
+  cursor: pointer;
+  line-height: 1;
+}
+.sr-board-link:hover { text-decoration: underline; }
 
 .sr-title {
   font-family: var(--font-serif);
@@ -345,7 +388,7 @@ watch(
   flex-wrap: wrap;
 }
 
-/* ── Pagination ── */
+/* Pagination*/
 .pagination { display: flex; gap: 4px; margin-top: 18px; flex-wrap: wrap; }
 .page-btn {
   padding: 4px 10px;

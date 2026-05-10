@@ -1,6 +1,4 @@
-/* ─────────────────────────────────────────────
-   TOKENS
-───────────────────────────────────────────── */
+﻿/* TOKENS */
 :root {
   --cream:      #f5f0e8;
   --cream-dark: #ede6d6;
@@ -21,9 +19,7 @@
   --font-sans:  'Trebuchet MS', 'Lucida Grande', sans-serif;
 }
 
-/* ─────────────────────────────────────────────
-   RESET / ROOT
-───────────────────────────────────────────── */
+/* RESET / ROOT */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 #museum-root {
@@ -54,9 +50,7 @@
   background-size: 180px;
 }
 
-/* ─────────────────────────────────────────────
-   HEADER
-───────────────────────────────────────────── */
+/* HEADER */
 header {
   background: var(--espresso);
   border-bottom: 3px solid var(--orange);
@@ -137,9 +131,7 @@ header {
   color: white !important;
 }
 
-/* ─────────────────────────────────────────────
-   HERO
-───────────────────────────────────────────── */
+/* HERO */
 .hero-banner {
   background: var(--brown-dk);
   background-image:
@@ -224,28 +216,7 @@ header {
 .deco-frame--2 { bottom: 22px; right: 40px; transform: rotate(3deg); }
 .deco-frame--3 { top: 50%; right: 60px; transform: translateY(-50%) rotate(-2deg); }
 
-/* ─────────────────────────────────────────────
-   BUTTONS
-───────────────────────────────────────────── */
-.btn-primary {
-  display: inline-block;
-  background: var(--orange);
-  color: white;
-  text-decoration: none;
-  padding: 9px 20px;
-  font-size: 12px;
-  font-weight: bold;
-  letter-spacing: 0.5px;
-  border: 1px solid var(--orange-lt);
-  cursor: pointer;
-  transition: background 0.15s, transform 0.1s;
-}
-
-.btn-primary:hover {
-  background: var(--orange-lt);
-  transform: translateY(-1px);
-}
-
+/* BUTTONS */
 .btn-ghost {
   display: inline-block;
   background: transparent;
@@ -263,16 +234,7 @@ header {
   background: rgba(255,255,255,0.05);
 }
 
-.btn-full {
-  display: block;
-  text-align: center;
-  margin-top: 10px;
-  font-size: 11px;
-}
-
-/* ─────────────────────────────────────────────
-   TICKER
-───────────────────────────────────────────── */
+/* TICKER */
 .ticker {
   background: var(--parchment);
   border-bottom: 1px solid var(--grey-lt);
@@ -294,9 +256,7 @@ header {
 .sep { color: var(--brown-lt); }
 .ticker-notice { color: var(--grey); font-style: italic; margin-left: auto; }
 
-/* ─────────────────────────────────────────────
-   MAIN LAYOUT
-───────────────────────────────────────────── */
+/* MAIN LAYOUT */
 main {
   max-width: 1100px;
   margin: 0 auto;
@@ -327,7 +287,6 @@ main {
 
 @media (max-width: 540px) {
   .header-inner { padding: 8px 12px; gap: 10px; }
-  .nav-aux { display: none; }
   .header-nav { gap: 2px; }
   .header-nav a { padding: 4px 8px; font-size: 11px; }
 }
@@ -337,9 +296,7 @@ main {
   .header-nav { width: 100%; }
 }
 
-/* ─────────────────────────────────────────────
-   SECTION HEADERS
-───────────────────────────────────────────── */
+/* SECTION HEADERS */
 .section-header {
   display: flex;
   align-items: center;
@@ -362,9 +319,7 @@ main {
   background: var(--grey-lt);
 }
 
-/* ─────────────────────────────────────────────
-   BOARDS TABLE
-───────────────────────────────────────────── */
+/* BOARDS TABLE */
 .boards-table {
   border: 1px solid var(--grey-lt);
   background: #fff;
@@ -463,9 +418,7 @@ main {
   font-family: var(--font-sans);
 }
 
-/* ─────────────────────────────────────────────
-   SIDEBAR
-───────────────────────────────────────────── */
+/* SIDEBAR */
 .sidebar {
   display: flex;
   flex-direction: column;
@@ -490,55 +443,6 @@ main {
   border-bottom: 2px solid var(--orange);
 }
 
-/* Recent posts */
-.recent-list {
-  list-style: none;
-  padding: 0;
-}
-
-.recent-item {
-  padding: 8px 12px;
-  border-bottom: 1px solid var(--cream-dark);
-}
-
-.recent-item:last-child { border-bottom: none; }
-
-.recent-link {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  text-decoration: none;
-}
-
-.recent-board {
-  font-family: var(--font-mono);
-  font-size: 10px;
-  color: var(--orange);
-  font-weight: bold;
-}
-
-.recent-title {
-  font-size: 12px;
-  color: var(--brown-dk);
-  line-height: 1.35;
-}
-
-.recent-link:hover .recent-title {
-  text-decoration: underline;
-  color: var(--orange);
-}
-
-.recent-meta {
-  display: flex;
-  gap: 10px;
-  margin-top: 3px;
-  font-size: 10px;
-  color: var(--grey);
-  font-family: var(--font-mono);
-}
-
-.recent-time { margin-left: auto; }
-
 /* Rules */
 .sidebar-block--rules .rules-list {
   padding: 12px 12px 12px 28px;
@@ -550,26 +454,7 @@ main {
   line-height: 1.4;
 }
 
-/* CTA */
-.sidebar-block--cta {
-  border-top: 2px solid var(--orange);
-}
-
-.sidebar-block--cta p {
-  font-size: 11px;
-  color: var(--grey-dk);
-  padding: 10px 12px 0;
-  line-height: 1.5;
-}
-
-.sidebar-block--cta .btn-full {
-  margin: 10px 12px 12px;
-  display: block;
-}
-
-/* ─────────────────────────────────────────────
-   FOOTER
-───────────────────────────────────────────── */
+/* FOOTER */
 footer {
   background: var(--espresso);
   border-top: 2px solid var(--brown-dk);

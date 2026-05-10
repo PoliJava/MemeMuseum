@@ -2,62 +2,87 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\ProfileUpdateRequest;
-use Illuminate\Contracts\Auth\MustVerifyEmail;
-use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Redirect;
-use Inertia\Inertia;
-use Inertia\Response;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Storage;
 
 class ProfileController extends Controller
 {
-    /**
-     * Display the user's profile form.
-     */
-    public function edit(Request $request): Response
+    public function show(Request $request): JsonResponse
     {
-        return Inertia::render('Profile/Edit', [
-            'mustVerifyEmail' => $request->user() instanceof MustVerifyEmail,
-            'status' => session('status'),
+        $user = $request->user();
+
+        $memes = $user->memes()
+            ->with('board')
+            ->withAvg('ratings', 'value')
+            ->latest()
+            ->get();
+
+        $rated     = $memes->filter(fn($m) => !is_null($m->ratings_avg_value));
+        $avgRating = $rated->isNotEmpty()
+            ? round($rated->avg('ratings_avg_value') * 2) / 2
+            : null;
+
+        $byBoard = $memes
+            ->groupBy('board_id')
+            ->map(fn($group) => [
+                'board_slug' => $group->first()->board->slug,
+                'board_name' => $group->first()->board->name,
+                'count'      => $group->count(),
+            ])
+            ->sortByDesc('count')
+            ->values();
+
+        $recent = $memes->take(6)->map(fn($m) => [
+            'id'         => $m->id,
+            'title'      => $m->title,
+            'image_path' => $m->image_path,
+            'board_slug' => $m->board->slug,
+            'avg_rating' => $m->ratings_avg_value
+                ? round($m->ratings_avg_value * 2) / 2
+                : null,
+            'created_at' => $m->created_at,
+        ])->values();
+
+        $favorites = $user->favorites()
+            ->with(['meme.board'])
+            ->latest()
+            ->get()
+            ->map(fn($f) => [
+                'id'         => $f->meme->id,
+                'title'      => $f->meme->title,
+                'image_path' => $f->meme->image_path,
+                'board_slug' => $f->meme->board->slug,
+            ])->values();
+
+        return response()->json([
+            'name'        => $user->name,
+            'email'       => $user->email,
+            'avatar_path' => $user->avatar_path,
+            'created_at'  => $user->created_at,
+            'memes_count' => $memes->count(),
+            'avg_rating'  => $avgRating,
+            'by_board'    => $byBoard,
+            'recent'      => $recent,
+            'favorites'   => $favorites,
         ]);
     }
 
-    /**
-     * Update the user's profile information.
-     */
-    public function update(ProfileUpdateRequest $request): RedirectResponse
-    {
-        $request->user()->fill($request->validated());
-
-        if ($request->user()->isDirty('email')) {
-            $request->user()->email_verified_at = null;
-        }
-
-        $request->user()->save();
-
-        return Redirect::route('profile.edit');
-    }
-
-    /**
-     * Delete the user's account.
-     */
-    public function destroy(Request $request): RedirectResponse
+    public function updateAvatar(Request $request): JsonResponse
     {
         $request->validate([
-            'password' => ['required', 'current_password'],
+            'avatar' => 'required|image|max:2048',
         ]);
 
         $user = $request->user();
 
-        Auth::logout();
+        if ($user->avatar_path) {
+            Storage::disk('public')->delete($user->avatar_path);
+        }
 
-        $user->delete();
+        $path = $request->file('avatar')->store('avatars', 'public');
+        $user->update(['avatar_path' => $path]);
 
-        $request->session()->invalidate();
-        $request->session()->regenerateToken();
-
-        return Redirect::to('/');
+        return response()->json(['avatar_path' => $path]);
     }
 }

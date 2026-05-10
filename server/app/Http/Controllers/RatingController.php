@@ -36,6 +36,12 @@ class RatingController extends Controller
               ->where('meme_id', $meme->id)
               ->delete();
 
-        return response()->json(['message' => 'Rating removed']);
+        $avg        = Rating::where('meme_id', $meme->id)->avg('value');
+        $avgRounded = $avg ? round($avg * 2) / 2 : null;
+
+        return response()->json([
+            'message'    => 'Rating removed',
+            'avg_rating' => $avgRounded,
+        ]);
     }
 }

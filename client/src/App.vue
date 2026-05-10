@@ -43,18 +43,17 @@ function requireAuthThenPost(slug?: string) {
     <header>
       <div class="header-inner">
         <div class="header-left">
-          <div class="logotype">
+          <router-link to="/" class="logotype">
             <span class="logo-mark">𝕄</span>
             <div class="logo-text">
               <span class="logo-name">MemeMuseum</span>
-              <span class="logo-sub">Est. MMXXV · Open Collection</span>
+              <span class="logo-sub">The First Historical Meme Archive</span>
             </div>
-          </div>
+          </router-link>
         </div>
         <nav class="header-nav">
-          <router-link to="/">Collection</router-link>
           <router-link to="/search">Browse</router-link>
-          <a href="#" class="nav-aux">About</a>
+          <router-link to="/about">About</router-link>
 
           <a
             v-if="!user"
@@ -65,10 +64,10 @@ function requireAuthThenPost(slug?: string) {
             Sign In
           </a>
           <template v-else>
-            <span class="nav-curator">
+            <router-link to="/profile" class="nav-curator">
               <span class="nav-curator-dot"></span>
               {{ user.name }}
-            </span>
+            </router-link>
             <a href="#" class="nav-login" @click.prevent="logout">Sign Out</a>
           </template>
         </nav>
@@ -87,7 +86,6 @@ function requireAuthThenPost(slug?: string) {
           original works, and participate in the ongoing curatorial discourse.
         </p>
         <div class="hero-actions">
-          <router-link to="/" class="btn-primary">Enter the Museum</router-link>
           <a
             v-if="!user"
             href="#"
@@ -131,9 +129,9 @@ function requireAuthThenPost(slug?: string) {
         <span class="footer-logo">𝕄 MemeMuseum</span>
         <span>Anonymous imageboard. All works property of their creators.</span>
         <nav class="footer-nav">
-          <a href="#">Rules</a>
-          <a href="#">Privacy</a>
-          <a href="#">Contact</a>
+          <router-link to="/about">Rules</router-link>
+          <router-link to="/about">About</router-link>
+          <router-link to="/board/meta">Contact</router-link>
         </nav>
       </div>
     </footer>
@@ -150,6 +148,13 @@ function requireAuthThenPost(slug?: string) {
 </template>
 
 <style>
+.logotype {
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+}
 .nav-curator {
   display: flex;
   align-items: center;
