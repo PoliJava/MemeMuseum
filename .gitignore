@@ -1,2 +1,4 @@
-node_modules/g
-.claude/
+node_modules/
+vendor/
+.env
+*.local
